@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../api';
 
 const Login = () => {
@@ -35,6 +35,9 @@ const Login = () => {
         <input className="form-control mb-2" placeholder="Phone Number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
         <input className="form-control mb-2" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
         <button className="btn btn-primary">Login</button>
+        <div className="mt-2">
+          <Link to="/forgot-password">Forgot Password?</Link>
+        </div>
         {msg && <div className="alert alert-info mt-3">{msg}</div>}
       </form>
     </div>
