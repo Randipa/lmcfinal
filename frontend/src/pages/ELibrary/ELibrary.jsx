@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Search, ArrowLeft, Book, FileText, Video, Download, Eye, Filter, Grid, List, Star, Calendar, User } from 'lucide-react';
+import './elibrary.css';
 
 // Mock API for demonstration
 const api = {
@@ -96,20 +97,20 @@ const ELibrary = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="elibrary-header mb-8">
           <h1 className="text-4xl font-bold text-gray-800 mb-2">E-Library</h1>
           <p className="text-gray-600">Discover and access educational resources</p>
         </div>
 
         {!category ? (
           /* Category Selection */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="elibrary-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map(c => {
               const IconComponent = c.icon;
               return (
                 <div
                   key={c.key}
-                  className={`relative overflow-hidden rounded-xl bg-gradient-to-r ${c.color} p-6 text-white cursor-pointer transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl`}
+                  className={`category-card relative bg-gradient-to-r ${c.color} p-6 text-white`}
                   onClick={() => setCategory(c.key)}
                 >
                   <div className="flex items-center justify-between">
@@ -154,7 +155,7 @@ const ELibrary = () => {
 
             {/* Search and Filters */}
             <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-              <div className="flex flex-col md:flex-row gap-4">
+              <div className="elibrary-search flex flex-col md:flex-row gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
@@ -196,7 +197,7 @@ const ELibrary = () => {
                 {filtered.map((item) => (
                   <div
                     key={item._id}
-                    className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 ${viewMode === 'list' ? 'flex items-center space-x-6' : ''}`}
+                    className={`elibrary-item bg-white rounded-xl p-6 shadow-sm ${viewMode === 'list' ? 'flex items-center space-x-6' : ''}`}
                   >
                     {viewMode === 'grid' ? (
                       <div className="flex flex-col h-full">
