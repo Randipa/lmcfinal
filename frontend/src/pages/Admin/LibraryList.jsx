@@ -35,6 +35,7 @@ function LibraryList() {
           <li key={it._id} className="list-group-item d-flex justify-content-between">
             <span>{it.title}</span>
             <span>
+              <Link className="btn btn-sm btn-outline-secondary me-2" to={`/admin/library/${it._id}/edit`}>Edit</Link>
               <a className="btn btn-sm btn-outline-primary me-2" href={it.fileUrl} target="_blank" rel="noopener noreferrer">Download</a>
               <button className="btn btn-sm btn-outline-danger" onClick={() => deleteItem(it._id)}>Delete</button>
             </span>

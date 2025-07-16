@@ -8,5 +8,6 @@ router.post('/library', authenticateToken, requireAdmin, uploadLibrary.single('f
 router.get('/library', controller.getItems);
 router.get('/library/:id', controller.getItemById);
 router.delete('/library/:id', authenticateToken, requireAdmin, controller.deleteItem);
+router.put('/library/:id', authenticateToken, requireAdmin, uploadLibrary.single('file'), controller.updateItem);
 
 module.exports = router;

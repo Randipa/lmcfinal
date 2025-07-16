@@ -5,6 +5,9 @@ import api from '../../api';
 function UploadLibrary() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('passpaper');
+  const [grade, setGrade] = useState('');
+  const [subject, setSubject] = useState('');
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
@@ -15,6 +18,9 @@ function UploadLibrary() {
       const fd = new FormData();
       fd.append('title', title);
       fd.append('description', description);
+      fd.append('category', category);
+      fd.append('grade', grade);
+      fd.append('subject', subject);
       if (file) fd.append('file', file);
       await api.post('/library', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setMessage('Uploaded');
@@ -36,6 +42,34 @@ function UploadLibrary() {
           onChange={(e) => setTitle(e.target.value)}
           required
         />
+        <select
+          className="form-control mb-2"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          required
+        >
+          <option value="passpaper">Pass Paper</option>
+          <option value="book">Book</option>
+          <option value="document">Document</option>
+          <option value="video">Video</option>
+          <option value="other">Other</option>
+        </select>
+        {category === 'passpaper' && (
+          <>
+            <input
+              className="form-control mb-2"
+              placeholder="Grade"
+              value={grade}
+              onChange={(e) => setGrade(e.target.value)}
+            />
+            <input
+              className="form-control mb-2"
+              placeholder="Subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+            />
+          </>
+        )}
         <textarea
           className="form-control mb-2"
           placeholder="Description"
