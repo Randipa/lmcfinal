@@ -9,6 +9,7 @@ function UploadLibrary() {
   const [grade, setGrade] = useState('');
   const [subject, setSubject] = useState('');
   const [file, setFile] = useState(null);
+  const [videoUrl, setVideoUrl] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
@@ -21,7 +22,11 @@ function UploadLibrary() {
       fd.append('category', category);
       fd.append('grade', grade);
       fd.append('subject', subject);
-      if (file) fd.append('file', file);
+      if (category === 'video') {
+        fd.append('fileUrl', videoUrl);
+      } else if (file) {
+        fd.append('file', file);
+      }
       await api.post('/library', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setMessage('Uploaded');
       navigate('/admin/library');
@@ -76,12 +81,22 @@ function UploadLibrary() {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <input
-          type="file"
-          className="form-control mb-2"
-          onChange={(e) => setFile(e.target.files[0])}
-          required
-        />
+        {category === 'video' ? (
+          <input
+            className="form-control mb-2"
+            placeholder="Video URL"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            required
+          />
+        ) : (
+          <input
+            type="file"
+            className="form-control mb-2"
+            onChange={(e) => setFile(e.target.files[0])}
+            required
+          />
+        )}
         <button className="btn btn-primary">Save</button>
       </form>
     </div>

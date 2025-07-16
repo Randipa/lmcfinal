@@ -2,14 +2,22 @@ const LibraryItem = require('../models/LibraryItem');
 
 exports.createItem = async (req, res) => {
   try {
-    const { title, description, category, grade, subject } = req.body;
-    if (!req.file) return res.status(400).json({ message: 'File is required' });
-    const baseUrl =
-      process.env.BASE_URL ||
-      (process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : `${req.protocol}://${req.get('host')}`);
-    const fileUrl = `${baseUrl}/uploads/library/${req.file.filename}`;
+    const { title, description, category, grade, subject, fileUrl: bodyUrl } =
+      req.body;
+    let fileUrl = bodyUrl;
+
+    if (!bodyUrl) {
+      if (!req.file)
+        return res.status(400).json({ message: 'File is required' });
+
+      const baseUrl =
+        process.env.BASE_URL ||
+        (process.env.VERCEL_URL
+          ? `https://${process.env.VERCEL_URL}`
+          : `${req.protocol}://${req.get('host')}`);
+      fileUrl = `${baseUrl}/uploads/library/${req.file.filename}`;
+    }
+
     const item = new LibraryItem({
       title,
       description,
@@ -28,7 +36,12 @@ exports.createItem = async (req, res) => {
 
 exports.getItems = async (req, res) => {
   try {
-    const items = await LibraryItem.find().sort({ createdAt: -1 });
+    const { category, search } = req.query;
+    const query = {};
+    if (category) query.category = category;
+    if (search) query.title = { $regex: search, $options: 'i' };
+
+    const items = await LibraryItem.find(query).sort({ createdAt: -1 });
     res.json({ items });
   } catch (err) {
     console.error(err);
@@ -66,9 +79,14 @@ exports.updateItem = async (req, res) => {
         ? `https://${process.env.VERCEL_URL}`
         : `${req.protocol}://${req.get('host')}`);
     const updates = { ...req.body };
+
     if (req.file) {
       updates.fileUrl = `${baseUrl}/uploads/library/${req.file.filename}`;
     }
+    if (req.body.fileUrl) {
+      updates.fileUrl = req.body.fileUrl;
+    }
+
     const item = await LibraryItem.findByIdAndUpdate(req.params.id, updates, {
       new: true,
       runValidators: true
