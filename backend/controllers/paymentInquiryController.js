@@ -6,15 +6,17 @@ const notifyAdmins = require('../utils/notifyAdmins');
 
 exports.createInquiry = async (req, res) => {
   try {
-    const { courseId } = req.body;
-    const userId = req.user.userId;
+    const { courseId, firstName, lastName, phoneNumber, message } = req.body;
+    const userId = req.user?.userId;
     if (!courseId) {
       return res.status(400).json({ message: 'Course id required' });
     }
 
+    const search = userId
+      ? { userId, courseId }
+      : { phoneNumber, courseId };
     const existing = await PaymentInquiry.findOne({
-      userId,
-      courseId,
+      ...search,
       status: { $in: ['pending', 'approved'] }
     });
 
@@ -22,13 +24,37 @@ exports.createInquiry = async (req, res) => {
       return res.status(400).json({ message: 'Inquiry already submitted' });
     }
 
-    const inquiry = await PaymentInquiry.create({ userId, courseId });
+    let inquiryData = { courseId, message };
+    if (userId) {
+      const user = await User.findById(userId);
+      inquiryData = {
+        ...inquiryData,
+        userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phoneNumber: user.phoneNumber
+      };
+    } else {
+      if (!firstName || !lastName || !phoneNumber) {
+        return res
+          .status(400)
+          .json({ message: 'Name and phone number required' });
+      }
+      inquiryData = {
+        ...inquiryData,
+        firstName,
+        lastName,
+        phoneNumber
+      };
+    }
+
+    const inquiry = await PaymentInquiry.create(inquiryData);
 
     try {
-      const user = await User.findById(userId);
       const course = await Course.findById(courseId);
-      if (user && course) {
-        const msg = `${user.firstName} ${user.lastName} submitted an inquiry for ${course.title}`;
+      if (course) {
+        const name = inquiryData.firstName + ' ' + inquiryData.lastName;
+        const msg = `${name} submitted an inquiry for ${course.title}`;
         await notifyAdmins(msg);
       }
     } catch (e) {
@@ -74,11 +100,30 @@ exports.approveInquiry = async (req, res) => {
   const inquiry = await PaymentInquiry.findById(id);
   if (!inquiry) return res.status(404).json({ message: 'Inquiry not found' });
 
+  // create user automatically if not already registered
+  let user = null;
+  if (inquiry.userId) {
+    user = await User.findById(inquiry.userId);
+  } else {
+    user = await User.findOne({ phoneNumber: inquiry.phoneNumber });
+    if (!user) {
+      user = new User({
+        firstName: inquiry.firstName || 'Student',
+        lastName: inquiry.lastName || '',
+        phoneNumber: inquiry.phoneNumber,
+        password: inquiry.phoneNumber,
+        education: 'N/A',
+        address: 'N/A'
+      });
+      await user.save();
+    }
+    inquiry.userId = user._id;
+  }
+
   inquiry.status = 'approved';
   await inquiry.save();
 
   try {
-    const user = await User.findById(inquiry.userId);
     const course = await Course.findById(inquiry.courseId);
     if (user && course) {
       const msg = `Your payment inquiry for ${course.title} has been approved.`;

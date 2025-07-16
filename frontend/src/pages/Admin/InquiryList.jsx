@@ -30,7 +30,7 @@ function InquiryList() {
         {inquiries.map(i => (
           <li key={i._id} className="list-group-item d-flex justify-content-between align-items-center">
             <span>
-              {i.userId?.firstName} {i.userId?.lastName} - {i.courseId?.title}
+              {i.userId?.firstName || i.firstName} {i.userId?.lastName || i.lastName} - {i.phoneNumber} - {i.courseId?.title}
             </span>
             {i.status === 'approved' ? (
               <span className="badge bg-success">Approved</span>

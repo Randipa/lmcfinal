@@ -12,6 +12,14 @@ const ClassDetail = () => {
   const [inquiryCount, setInquiryCount] = useState(0);
   const [inquiryStatus, setInquiryStatus] = useState('');
   const [now] = useState(new Date());
+  const [showInquiry, setShowInquiry] = useState(false);
+  const [guestSubmitted, setGuestSubmitted] = useState(false);
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    message: ''
+  });
 
   const token = localStorage.getItem('token');
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -68,12 +76,34 @@ const ClassDetail = () => {
     fetchInquiryInfo();
   }, [classId, token]);
 
-  const handleInquiry = async () => {
-    if (!token) return navigate('/login');
+  const openInquiryForm = () => {
+    if (token) {
+      setForm({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        phoneNumber: user.phoneNumber || '',
+        message: ''
+      });
+    } else {
+      setForm({ firstName: '', lastName: '', phoneNumber: '', message: '' });
+    }
+    setShowInquiry(true);
+  };
+
+  const handleInquiry = async (e) => {
+    e.preventDefault();
     try {
-      await api.post('/inquiries', { courseId: classId });
+      await api.post('/inquiries', {
+        courseId: classId,
+        ...form
+      });
       setMessage('Inquiry sent. Admin will enable payment soon.');
-      fetchInquiryInfo();
+      setShowInquiry(false);
+      if (token) {
+        fetchInquiryInfo();
+      } else {
+        setGuestSubmitted(true);
+      }
     } catch (err) {
       const msg = err.response?.data?.message || 'Failed to send inquiry.';
       setMessage(msg);
@@ -486,6 +516,27 @@ const ClassDetail = () => {
           border: 1px solid #f5c6cb;
         }
 
+        .inquiry-modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0,0,0,0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+        }
+
+        .inquiry-modal .modal-content {
+          background: #fff;
+          padding: 20px;
+          border-radius: 10px;
+          width: 90%;
+          max-width: 400px;
+        }
+
         .empty-state {
           text-align: center;
           padding: 60px 20px;
@@ -581,21 +632,64 @@ const ClassDetail = () => {
       {/* Login Prompt */}
       {!token && (
         <div className="login-prompt">
-          <p>Please <a href="/login">log in</a> to enroll in this course and access premium content.</p>
+          <p>You can submit an inquiry without logging in, but logging in allows tracking.</p>
+        </div>
+      )}
+
+      {showInquiry && (
+        <div className="inquiry-modal">
+          <div className="modal-content">
+            <h4>Send Inquiry</h4>
+            <form onSubmit={handleInquiry}>
+              <input
+                className="form-control mb-2"
+                placeholder="First Name"
+                value={form.firstName}
+                onChange={e => setForm({ ...form, firstName: e.target.value })}
+                required
+              />
+              <input
+                className="form-control mb-2"
+                placeholder="Last Name"
+                value={form.lastName}
+                onChange={e => setForm({ ...form, lastName: e.target.value })}
+                required
+              />
+              <input
+                className="form-control mb-2"
+                placeholder="Phone Number"
+                value={form.phoneNumber}
+                onChange={e => setForm({ ...form, phoneNumber: e.target.value })}
+                required
+              />
+              <textarea
+                className="form-control mb-2"
+                placeholder="Message (optional)"
+                value={form.message}
+                onChange={e => setForm({ ...form, message: e.target.value })}
+              />
+              <div className="d-flex gap-2">
+                <button className="btn btn-primary" type="submit">Submit</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowInquiry(false)}>Cancel</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
       {/* Payment Section */}
-      {token && !hasAccess && (
+      {!hasAccess && (
         <div className="payment-section">
           <h3>💬 Request Payment Access</h3>
           <p>Send a request to enable payment for this course.</p>
-          {inquiryCount > 0 && (
+          {token && inquiryCount > 0 && (
             <p>You have sent {inquiryCount} inquiry{inquiryCount > 1 ? 'ies' : 'y'}.</p>
           )}
-          {inquiryStatus === '' || inquiryStatus === 'rejected' ? (
+          {(!token && guestSubmitted) ? (
+            <p>Inquiry submitted.</p>
+          ) : inquiryStatus === '' || inquiryStatus === 'rejected' ? (
             <div className="payment-buttons">
-              <button className="btn-primary" onClick={handleInquiry}>
+              <button className="btn-primary" onClick={openInquiryForm}>
                 Send Inquiry
               </button>
             </div>
@@ -680,7 +774,7 @@ const ClassDetail = () => {
                         {token && !hasAccess && (
                           <button
                             className="unlock-btn"
-                            onClick={handleInquiry}
+                            onClick={openInquiryForm}
                           >
                             🔓 Request Access
                           </button>
