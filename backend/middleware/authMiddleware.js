@@ -12,6 +12,19 @@ exports.authenticateToken = (req, res, next) => {
   });
 };
 
+// Optional authentication middleware - proceeds without user if no or invalid token
+exports.optionalAuthenticate = (req, res, next) => {
+  const token = req.headers['authorization']?.split(' ')[1];
+  if (!token) return next();
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (!err) {
+      req.user = decoded;
+    }
+    next();
+  });
+};
+
 // Role-based authorization middleware
 exports.requireRole = (allowedRoles) => {
   return (req, res, next) => {
