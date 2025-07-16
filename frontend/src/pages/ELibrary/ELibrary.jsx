@@ -19,22 +19,26 @@ const ELibrary = () => {
   return (
     <div className="container py-4">
       <h4>E-Library</h4>
-      <ul className="list-group mb-4">
+      <div className="row gy-4 mb-4">
         {items.map((res) => (
-          <li
-            key={res._id}
-            className="list-group-item d-flex justify-content-between"
-          >
-            {res.title}
-            <button
-              className="btn btn-outline-primary btn-sm"
-              onClick={() => openViewer(res)}
-            >
-              View
-            </button>
-          </li>
+          <div key={res._id} className="col-md-4">
+            <div className="card h-100 shadow-sm">
+              <div className="card-body d-flex flex-column">
+                <h5 className="card-title">{res.title}</h5>
+                {res.description && (
+                  <p className="card-text flex-grow-1">{res.description}</p>
+                )}
+                <button
+                  className="btn btn-primary btn-sm mt-auto"
+                  onClick={() => openViewer(res)}
+                >
+                  View
+                </button>
+              </div>
+            </div>
+          </div>
         ))}
-      </ul>
+      </div>
 
       {active && (
         <div className="border p-3 bg-light">
