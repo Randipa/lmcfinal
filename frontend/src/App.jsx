@@ -59,6 +59,7 @@ import BankPaymentRequests from './pages/Admin/BankPaymentRequests';
 import LibraryList from './pages/Admin/LibraryList';
 import UploadLibrary from './pages/Admin/UploadLibrary';
 import InquiryList from './pages/Admin/InquiryList';
+import InquiryDetail from './pages/Admin/InquiryDetail';
 import TeacherListAdmin from './pages/Admin/TeacherList';
 import CreateTeacher from './pages/Admin/CreateTeacher';
 import EditTeacher from './pages/Admin/EditTeacher';
@@ -144,6 +145,7 @@ function App() {
         <Route path="/admin/payments" element={<RequireAdmin><PaymentList /></RequireAdmin>} />
         <Route path="/admin/bank-payments" element={<RequireAdmin><BankPaymentRequests /></RequireAdmin>} />
         <Route path="/admin/inquiries" element={<RequireAdmin><InquiryList /></RequireAdmin>} />
+        <Route path="/admin/inquiries/:inquiryId" element={<RequireAdmin><InquiryDetail /></RequireAdmin>} />
         <Route path="/admin/library" element={<RequireAdmin><LibraryList /></RequireAdmin>} />
         <Route path="/admin/library/upload" element={<RequireAdmin><UploadLibrary /></RequireAdmin>} />
         <Route path="/admin/teachers" element={<RequireAdmin><TeacherListAdmin /></RequireAdmin>} />

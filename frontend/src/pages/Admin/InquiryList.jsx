@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../api';
 
 function InquiryList() {
@@ -32,11 +33,14 @@ function InquiryList() {
             <span>
               {i.userId?.firstName || i.firstName} {i.userId?.lastName || i.lastName} - {i.phoneNumber} - {i.courseId?.title}
             </span>
-            {i.status === 'approved' ? (
-              <span className="badge bg-success">Approved</span>
-            ) : (
-              <button className="btn btn-sm btn-primary" onClick={() => approve(i._id)}>Approve</button>
-            )}
+            <div className="d-flex gap-2 align-items-center">
+              <Link className="btn btn-sm btn-outline-secondary" to={`/admin/inquiries/${i._id}`}>View</Link>
+              {i.status === 'approved' ? (
+                <span className="badge bg-success">Approved</span>
+              ) : (
+                <button className="btn btn-sm btn-primary" onClick={() => approve(i._id)}>Approve</button>
+              )}
+            </div>
           </li>
         ))}
       </ul>
