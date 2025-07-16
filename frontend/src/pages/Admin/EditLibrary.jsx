@@ -12,19 +12,25 @@ function EditLibrary() {
     subject: ''
   });
   const [file, setFile] = useState(null);
+  const [videoUrl, setVideoUrl] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     api
       .get(`/library/${itemId}`)
-      .then(res => setForm({
-        title: res.data.item.title || '',
-        description: res.data.item.description || '',
-        category: res.data.item.category || 'passpaper',
-        grade: res.data.item.grade || '',
-        subject: res.data.item.subject || ''
-      }))
+      .then(res => {
+        setForm({
+          title: res.data.item.title || '',
+          description: res.data.item.description || '',
+          category: res.data.item.category || 'passpaper',
+          grade: res.data.item.grade || '',
+          subject: res.data.item.subject || ''
+        });
+        if (res.data.item.category === 'video') {
+          setVideoUrl(res.data.item.fileUrl || '');
+        }
+      })
       .catch(() => navigate('/admin/library'));
   }, [itemId, navigate]);
 
@@ -32,6 +38,8 @@ function EditLibrary() {
     const { name, value, files } = e.target;
     if (name === 'file' && files) {
       setFile(files[0]);
+    } else if (name === 'videoUrl') {
+      setVideoUrl(value);
     } else {
       setForm({ ...form, [name]: value });
     }
@@ -46,7 +54,11 @@ function EditLibrary() {
       fd.append('category', form.category);
       fd.append('grade', form.grade);
       fd.append('subject', form.subject);
-      if (file) fd.append('file', file);
+      if (form.category === 'video') {
+        fd.append('fileUrl', videoUrl);
+      } else if (file) {
+        fd.append('file', file);
+      }
       await api.put(`/library/${itemId}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setMessage('Item updated');
       navigate('/admin/library');
@@ -106,12 +118,23 @@ function EditLibrary() {
           value={form.description}
           onChange={handleChange}
         />
-        <input
-          className="form-control mb-2"
-          name="file"
-          type="file"
-          onChange={handleChange}
-        />
+        {form.category === 'video' ? (
+          <input
+            className="form-control mb-2"
+            name="videoUrl"
+            placeholder="Video URL"
+            value={videoUrl}
+            onChange={handleChange}
+            required
+          />
+        ) : (
+          <input
+            className="form-control mb-2"
+            name="file"
+            type="file"
+            onChange={handleChange}
+          />
+        )}
         <button className="btn btn-primary">Save</button>
       </form>
     </div>
