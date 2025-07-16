@@ -1,0 +1,37 @@
+:root {
+  --bs-primary: #006c5d;
+  --bs-secondary: #f7a70c;
+  --bs-body-bg: #f5f7fa;
+  --bs-body-color: #333;
+}
+
+body {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+.navbar-custom {
+  background-color: var(--bs-primary);
+}
+
+.tile-link {
+  color: #fff;
+}
+.tile-link:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.tile {
+  background: linear-gradient(135deg, var(--bs-primary), var(--bs-secondary));
+  color: #fff;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.tile-icon {
+  font-size: 3rem;
+}

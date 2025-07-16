@@ -1,0 +1,50 @@
+:root {
+  --wave-primary: #2a7de1;
+  --wave-secondary: #f05a28;
+  --wave-bg: #eef5fd;
+  --wave-text: #333;
+}
+
+body {
+  background-color: var(--wave-bg);
+  color: var(--wave-text);
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.navbar-custom {
+  background: linear-gradient(90deg, var(--wave-primary), var(--wave-secondary));
+}
+
+.tile-link {
+  color: #fff;
+}
+.tile-link:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.tile {
+  background: linear-gradient(135deg, var(--wave-primary), var(--wave-secondary));
+  color: #fff;
+  border: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 12px;
+}
+.tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.tile-icon {
+  font-size: 3rem;
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--wave-primary), var(--wave-secondary));
+  color: #fff;
+  padding: 4rem 2rem;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
