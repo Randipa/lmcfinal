@@ -94,6 +94,23 @@ exports.getInquiries = async (req, res) => {
   }
 };
 
+// Get single inquiry (Admin only)
+exports.getInquiry = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const inquiry = await PaymentInquiry.findById(id)
+      .populate('userId', 'firstName lastName phoneNumber')
+      .populate('courseId', 'title price');
+    if (!inquiry) {
+      return res.status(404).json({ message: 'Inquiry not found' });
+    }
+    res.json({ inquiry });
+  } catch (err) {
+    console.error('Get inquiry error:', err);
+    res.status(500).json({ message: 'Failed to fetch inquiry' });
+  }
+};
+
 exports.approveInquiry = async (req, res) => {
   try {
     const { id } = req.params;
